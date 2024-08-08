@@ -24,13 +24,15 @@
         <h2>패턴을 그려서 잠금을 해제하세요</h2>
         <canvas id="lockPattern" width="300" height="300"></canvas>
         <script>
-            const unlockPattern = [4, 6, 7, 8]; // 잠금 해제 패턴
+            const unlockPattern = [0, 1, 2, 5, 8];
             const canvas = document.getElementById("lockPattern");
             const ctx = canvas.getContext("2d");
             const points = [];
             let pattern = [];
             let isDrawing = false;
             let currentPosition = { x: 0, y: 0 };
+            let hasStoppedDrawing = false;
+            let lineColor = "rgba(255, 0, 0, 0.5)"; // 기본값: 빨간색, 불투명도 100%
 
             for (let i = 0; i < 3; i++) {
                 for (let j = 0; j < 3; j++) {
@@ -55,8 +57,8 @@
                 ctx.beginPath();
                 ctx.moveTo(point1.x, point1.y);
                 ctx.lineTo(point2.x, point2.y);
-                ctx.strokeStyle = "red";
-                ctx.lineWidth = 5;
+                ctx.strokeStyle = lineColor;
+                ctx.lineWidth = 10;
                 ctx.stroke();
             }
 
@@ -82,6 +84,7 @@
 
             function startDrawing(e) {
                 isDrawing = true;
+                hasStoppedDrawing = false;
                 addPointToPattern(e);
                 updateCurrentPosition(e);
                 requestAnimationFrame(animate);
@@ -94,6 +97,8 @@
             }
 
             function stopDrawing() {
+                if (hasStoppedDrawing) return;
+                hasStoppedDrawing = true;
                 isDrawing = false;
                 console.log("입력한 패턴:", pattern);
                 checkPattern();
@@ -131,8 +136,10 @@
 
             function checkPattern() {
                 if (JSON.stringify(pattern) === JSON.stringify(unlockPattern)) {
+                    lineColor = "rgba(0, 255, 0, 0.7)"; // 패턴이 올바른 경우 초록색, 불투명도 70%
                     alert("잠금 해제 성공!");
                 } else {
+                    lineColor = "rgba(255, 0, 0, 0.7)"; // 패턴이 잘못된 경우 빨간색, 불투명도 70%
                     alert("잘못된 패턴입니다. 다시 시도해주세요.");
                 }
             }
